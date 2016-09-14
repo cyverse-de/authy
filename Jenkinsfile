@@ -1,17 +1,14 @@
 #!groovy
-def repo = "authy"
-def dockerUser = "discoenv"
-
 node {
     stage "Build"
     checkout scm
 
-    dockerRepo = "test-${repo}-${env.BUILD_TAG}"
+    dockerRepo = "test-${env.BUILD_TAG}"
 
     sh "docker build --rm -t ${dockerRepo} ."
 
-    dockerTestRunner = "test-${repo}-${env.BUILD_TAG}"
-    dockerDeployer = "deploy-${repo}-${env.BUILD_TAG}"
+    dockerTestRunner = "test-${env.BUILD_TAG}"
+    dockerDeployer = "deploy-${env.BUILD_TAG}"
     try {
         stage "Test"
             sh "docker run --name ${dockerTestRunner}--rm ${dockerRepo}"
