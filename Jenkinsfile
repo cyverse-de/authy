@@ -15,7 +15,7 @@ node('docker' && 'testing') {
         try {
             stage "Test"
             try {
-                sh "docker run --name ${dockerTestRunner} --rm ${dockerRepo}"
+                sh "docker run --rm --name ${dockerTestRunner} -v \$(pwd)/test2junit:/usr/src/app/test2junit ${dockerRepo}"
             } finally {
                 junit 'test2junit/xml/*.xml'
 
