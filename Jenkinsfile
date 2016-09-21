@@ -1,5 +1,5 @@
 #!groovy
-node {
+node('docker' && 'testing') {
     slackJobDescription = "job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
     try {
         stage "Build"
