@@ -10,6 +10,7 @@ node {
         sh "docker build --rm -t ${dockerRepo} ."
 
         dockerTestRunner = "test-${env.BUILD_TAG}"
+        dockerTestCleanup = "test-cleanup-${env.BUILD_TAG}"
         dockerDeployer = "deploy-${env.BUILD_TAG}"
         try {
             stage "Test"
@@ -18,7 +19,6 @@ node {
             } finally {
                 junit 'test2junit/xml/*.xml'
 
-                dockerTestCleanup = "test-cleanup-${env.BUILD_TAG}"
                 sh "docker run --rm --name ${dockerTestCleanup} -v \$(pwd):/build -w /build alpine rm -r test2junit"
             }
 

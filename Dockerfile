@@ -6,4 +6,4 @@ COPY project.clj /usr/src/authy/
 RUN lein deps
 
 COPY . /usr/src/authy
-CMD ["lein", "test"]
+CMD ["lein", "test2junit"]
