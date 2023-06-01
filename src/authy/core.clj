@@ -80,8 +80,8 @@
                        :socket-timeout   timeout
                        :throw-exceptions false})
            (:body)
-           (:error)
-           (= "invalid_grant")))
+           (:status)
+           (= "error")))
 
 (defn- check-reauth
   [token-info timeout]
