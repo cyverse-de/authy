@@ -15,8 +15,7 @@
 
 (defn- format-token-info
   [{:keys [access_token refresh_token]}]
-  {:token-type    "bearer"
-   :expires-at    (Timestamp. (+ (System/currentTimeMillis) (* 1000 (:expires_in access_token))))
+  {:expires-at    (Timestamp. (+ (System/currentTimeMillis) (* 1000 (:expires_in access_token))))
    :refresh-token (:refresh_token refresh_token)
    :access-token  (:access_token access_token)})
 
