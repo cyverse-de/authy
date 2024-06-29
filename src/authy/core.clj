@@ -1,7 +1,6 @@
 (ns authy.core
   (:use [slingshot.slingshot :only [throw+ try+]])
   (:require [clj-http.client :as http]
-            [clojure.string :as string]
             [clojure.tools.logging :as log])
   (:import [java.io IOException]
            [java.sql Timestamp]))
@@ -15,12 +14,10 @@
   token-info)
 
 (defn- format-token-info
-  [token-info]
-  (assoc (dissoc token-info :token_type :expires_in :refresh_token :access_token)
-    :token-type    (:token_type token-info)
-    :expires-at    (Timestamp. (+ (System/currentTimeMillis) (* 1000 (:expires_in token-info))))
-    :refresh-token (:refresh_token token-info)
-    :access-token  (:access_token token-info)))
+  [{:keys [access_token refresh_token]}]
+  {:expires-at    (Timestamp. (+ (System/currentTimeMillis) (* 1000 (:expires_in access_token))))
+   :refresh-token (:refresh_token refresh_token)
+   :access-token  (:access_token access_token)})
 
 (defn- auth-code-token-request
   [{:keys [token-uri redirect-uri client-key client-secret]} code timeout]
@@ -36,15 +33,16 @@
 (defn get-access-token
   [oauth-info code & {:keys [timeout] :or {timeout 5000}}]
   (->> (auth-code-token-request oauth-info code timeout)
+       :result
        (format-token-info)
        (merge oauth-info)
        (call-token-callback)))
 
 (defn- credentials-token-request
-  [{:keys [token-uri redirect-uri client-key client-secret]} username password timeout]
+  [{:keys [token-uri client-key client-secret]} username password timeout]
   (:body (http/post token-uri
                     {:basic-auth     [client-key client-secret]
-                     :form-params    {:grant_type "client_credentials"
+                     :form-params    {:grant_type "password"
                                       :username   username
                                       :password   password}
                      :as             :json
@@ -54,6 +52,7 @@
 (defn get-access-token-for-credentials
   [oauth-info username password & {:keys [timeout] :or {timeout 5000}}]
   (->> (credentials-token-request oauth-info username password timeout)
+       :result
        (format-token-info)
        (merge oauth-info)
        (call-token-callback)))
@@ -81,8 +80,8 @@
                        :socket-timeout   timeout
                        :throw-exceptions false})
            (:body)
-           (:error)
-           (= "invalid_grant")))
+           (:status)
+           (= "error")))
 
 (defn- check-reauth
   [token-info timeout]
@@ -104,6 +103,7 @@
 (defn refresh-access-token
   [token-info & {:keys [timeout] :or {timeout 5000}}]
   (->> (refresh-token-request token-info timeout)
+       :result
        (format-token-info)
        (merge token-info)
        (call-token-callback)))
