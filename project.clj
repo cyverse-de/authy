@@ -1,4 +1,4 @@
-(defproject org.cyverse/authy "3.0.1-SNAPSHOT"
+(defproject org.cyverse/authy "3.0.1"
   :description "An OAuth 2.0 client clibrary written in Clojure."
   :url "https://github.com/cyverse-de/authy"
   :license {:name "BSD Standard License"
