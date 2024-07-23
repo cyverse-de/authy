@@ -11,3 +11,6 @@ build.xml
 test2junit
 .idea
 *.iml
+.clj-kondo
+.eastwood
+.lsp
